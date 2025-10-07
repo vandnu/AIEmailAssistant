@@ -1,0 +1,15 @@
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.GeneratedMSBuildEditorConfig.editorconfig
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.AssemblyInfoInputs.cache
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.AssemblyInfo.cs
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.csproj.CoreCompileInputs.cache
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.sourcelink.json
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/bin/Debug/net9.0/AiEmailConsole
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/bin/Debug/net9.0/AiEmailConsole.deps.json
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/bin/Debug/net9.0/AiEmailConsole.runtimeconfig.json
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/bin/Debug/net9.0/AiEmailConsole.dll
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/bin/Debug/net9.0/AiEmailConsole.pdb
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.dll
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/refint/AiEmailConsole.dll
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.pdb
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/AiEmailConsole.genruntimeconfig.cache
+/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/obj/Debug/net9.0/ref/AiEmailConsole.dll
