@@ -10,19 +10,50 @@ class Program
         Console.WriteLine("Skriv en mail (test): ");
         var email = Console.ReadLine() ?? "";
 
-        var payload = JsonSerializer.Serialize(new { email_text = email });
+        var payload = JsonSerializer.Serialize(new { email_text = email, feedback = "" });
         var reply = await RunPythonAsync("../ai_engine.py", payload);
+
+        // Log originalt forslag
+        int iteration = 0;
+        System.IO.File.AppendAllText("log.txt",
+            $"=== {DateTime.Now} | Iteration {iteration} ===\nEmail: {email}\nAI-svar: {reply}\nFeedback: {""}\n\n");
 
         Console.WriteLine("\n--- Forslag fra AI ---\n");
         Console.WriteLine(reply);
+        
+        string feedback ="";
+        while (true)
+        {
+             Console.Write("\nGodkend og send? (J/N): ");
+             var confirm = Console.ReadLine()?.Trim().ToLower();
 
-        Console.Write("\nGodkend og send? (J/N): ");
-        var confirm = Console.ReadLine()?.Trim().ToLower();
-        if (confirm == "j" || confirm == "ja")
-            Console.WriteLine("Svar er godkendt og klar til afsendelse.");
-        else
-            Console.WriteLine("Annulleret.");
-    }
+             if (confirm == "j" || confirm == "ja")
+             {
+                Console.WriteLine("Svar er godkendt og klar til afsendelse.");
+                break;
+             }
+             else if (confirm == "n" || confirm == "nej")
+             {
+                Console.Write("Hvad skal forbedres? ");
+                feedback = Console.ReadLine() ?? "";
+
+                var newPayload = JsonSerializer.Serialize(new { email_text = email, feedback = feedback });
+                var newReply = await RunPythonAsync("../ai_engine.py", newPayload);
+
+                // Log opdateret forslag
+                iteration++;
+                System.IO.File.AppendAllText("log.txt",
+                    $"=== {DateTime.Now} | Iteration {iteration} ===\nEmail: {email}\nAI-svar: {newReply}\nFeedback: {feedback}\n\n");
+
+                Console.WriteLine("\n--- Opdateret forslag fra AI ---\n");
+                Console.WriteLine(newReply);
+             }
+             else
+             {
+                Console.WriteLine("Skriv J for ja eller N for nej.");
+             }
+        }
+    }        
 
     static async Task<string> RunPythonAsync(string scriptPath, string inputJson)
     {
