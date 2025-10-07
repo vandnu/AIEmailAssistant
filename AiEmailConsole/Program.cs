@@ -2,58 +2,112 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MailKit;
+using MailKit.Net.Imap;
+using MailKit.Net.Smtp;
+using MailKit.Search;
+using MimeKit;
 
 class Program
 {
     static async Task Main()
     {
-        Console.WriteLine("Skriv en mail (test): ");
-        var email = Console.ReadLine() ?? "";
+        string emailAddress = "testeraiapp218@gmail.com";
+        string appPassword = Environment.GetEnvironmentVariable("EMAIL_APP_PASSWORD") ?? "";
 
-        var payload = JsonSerializer.Serialize(new { email_text = email, feedback = "" });
-        var reply = await RunPythonAsync("../ai_engine.py", payload);
+        using var imap = new ImapClient();
+        imap.Connect("imap.gmail.com", 993, true);
+        imap.Authenticate(emailAddress, appPassword);
 
-        // Log originalt forslag
-        int iteration = 0;
-        System.IO.File.AppendAllText("log.txt",
-            $"=== {DateTime.Now} | Iteration {iteration} ===\nEmail: {email}\nAI-svar: {reply}\nFeedback: {""}\n\n");
+        var inbox = imap.Inbox;
+        inbox.Open(MailKit.FolderAccess.ReadWrite);
 
-        Console.WriteLine("\n--- Forslag fra AI ---\n");
-        Console.WriteLine(reply);
-        
-        string feedback ="";
+        Console.WriteLine("Live-mail assistent kører... Tryk Ctrl+C for at stoppe.");
+
         while (true)
         {
-             Console.Write("\nGodkend og send? (J/N): ");
-             var confirm = Console.ReadLine()?.Trim().ToLower();
+            Console.WriteLine("Tjekker efter nye mails ...");
+            inbox.Check();
+            var uids = inbox.Search(SearchQuery.NotSeen);
+            foreach (var uid in uids)
+            {
+                var message = inbox.GetMessage(uid);
+                string emailText = message.TextBody ?? "";
+                string feedback = "";
 
-             if (confirm == "j" || confirm == "ja")
-             {
-                Console.WriteLine("Svar er godkendt og klar til afsendelse.");
-                break;
-             }
-             else if (confirm == "n" || confirm == "nej")
-             {
-                Console.Write("Hvad skal forbedres? ");
-                feedback = Console.ReadLine() ?? "";
+                var payload = JsonSerializer.Serialize(new { email_text = emailText, feedback });
+                var reply = await RunPythonAsync("../ai_engine.py", payload);
 
-                var newPayload = JsonSerializer.Serialize(new { email_text = email, feedback = feedback });
-                var newReply = await RunPythonAsync("../ai_engine.py", newPayload);
+                Console.WriteLine("\n--- Ny mail ---");
+                Console.WriteLine(emailText);
 
-                // Log opdateret forslag
-                iteration++;
+                Console.WriteLine("\n--- Forslag fra AI ---\n");
+                Console.WriteLine(reply);
+
+                bool skipMail = false;
+
+                while (true)
+                {
+                    Console.Write("\nGodkend og send? (J/N/Spring over): ");
+                    var confirm = Console.ReadLine()?.Trim().ToLower();
+
+                    if (confirm == "j" || confirm == "ja") break;
+                    else if (confirm == "n" || confirm == "nej")
+                    {
+                        Console.Write("Hvad skal forbedres? ");
+                        feedback = Console.ReadLine() ?? "";
+                        payload = JsonSerializer.Serialize(new { email_text = emailText, feedback });
+                        reply = await RunPythonAsync("../ai_engine.py", payload);
+                        Console.WriteLine("\n--- Opdateret forslag fra AI ---\n");
+                        Console.WriteLine(reply);
+                    }
+                    else if (confirm == "spring over")
+                    {
+                        Console.WriteLine("Mail springes over.");
+                        skipMail = true;
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Skriv J for ja, N for nej eller spring over.");
+                    }
+                }
+
+                // Send svar via SMTP
+                if(!skipMail)
+                {
+                var response = new MimeMessage();
+                response.From.Add(MailboxAddress.Parse(emailAddress));
+                response.To.Add(message.From.Mailboxes.First());
+                response.Subject = "Re: " + message.Subject;
+                response.Body = new TextPart("plain") { Text = reply };
+
+                using var smtp = new SmtpClient();
+                smtp.Connect("smtp.gmail.com", 587, false);
+                smtp.Authenticate(emailAddress, appPassword);
+                smtp.Send(response);
+                smtp.Disconnect(true);
+                }
+                else
+                {
+                    Console.WriteLine("Mail blev ikke sendt.");
+                }
+
+                // Markér som læst
+                inbox.AddFlags(uid, MessageFlags.Seen, true);
+
+                // Log
                 System.IO.File.AppendAllText("log.txt",
-                    $"=== {DateTime.Now} | Iteration {iteration} ===\nEmail: {email}\nAI-svar: {newReply}\nFeedback: {feedback}\n\n");
+                    $"=== {DateTime.Now} ===\nEmail: {emailText}\nAI-svar: {reply}\nFeedback: {feedback}\n\n");
+            }
 
-                Console.WriteLine("\n--- Opdateret forslag fra AI ---\n");
-                Console.WriteLine(newReply);
-             }
-             else
-             {
-                Console.WriteLine("Skriv J for ja eller N for nej.");
-             }
+            // Vent 30 sekunder før næste tjek
+            await Task.Delay(30000);
         }
-    }        
+
+        // Denne linje sker først når programmet stoppes manuelt
+        // imap.Disconnect(true);
+    }
 
     static async Task<string> RunPythonAsync(string scriptPath, string inputJson)
     {

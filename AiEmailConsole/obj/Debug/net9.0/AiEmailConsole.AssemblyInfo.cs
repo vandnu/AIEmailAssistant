@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AiEmailConsole")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+49bc1b109bd6586ee350273e6361ce906ddaf621")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+911417b67f43a1fd73ae7c13f6b9995671e0d6ba")]
 [assembly: System.Reflection.AssemblyProductAttribute("AiEmailConsole")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AiEmailConsole")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

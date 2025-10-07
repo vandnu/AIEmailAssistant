@@ -1,8 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "X4eNhnPh2DM=",
+  "dgSpecHash": "GXS6OqUml3M=",
   "success": true,
   "projectFilePath": "/Users/Vannu/Desktop/AIEmailAssistant/AiEmailConsole/AiEmailConsole.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/Vannu/.nuget/packages/bouncycastle.cryptography/2.6.1/bouncycastle.cryptography.2.6.1.nupkg.sha512",
+    "/Users/Vannu/.nuget/packages/mailkit/4.14.0/mailkit.4.14.0.nupkg.sha512",
+    "/Users/Vannu/.nuget/packages/mimekit/4.14.0/mimekit.4.14.0.nupkg.sha512",
+    "/Users/Vannu/.nuget/packages/system.formats.asn1/8.0.1/system.formats.asn1.8.0.1.nupkg.sha512",
+    "/Users/Vannu/.nuget/packages/system.security.cryptography.pkcs/8.0.1/system.security.cryptography.pkcs.8.0.1.nupkg.sha512"
+  ],
   "logs": []
 }
