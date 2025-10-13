@@ -32,6 +32,15 @@ class Program
             foreach (var uid in uids)
             {
                 var message = inbox.GetMessage(uid);
+
+                // Vis afsender og emne
+                var from = message.From.ToString();
+                var subject = message.Subject ?? "(intet emne)";
+                Console.WriteLine($"Mail fra: {from}");
+                Console.WriteLine($"    Emne: {subject}");
+                Console.WriteLine(new string('-', 50));
+
+
                 string emailText = message.TextBody ?? "";
                 string feedback = "";
 
@@ -97,8 +106,11 @@ class Program
                 inbox.AddFlags(uid, MessageFlags.Seen, true);
 
                 // Log
-                System.IO.File.AppendAllText("log.txt",
-                    $"=== {DateTime.Now} ===\nEmail: {emailText}\nAI-svar: {reply}\nFeedback: {feedback}\n\n");
+                var logEntry = $"=== {DateTime.Now} === \nFra: {message.From}\nEmne: {message.Subject}\n";
+                logEntry += skipMail
+                    ? "Mail blev sprunget over.\n\n"
+                    : $"Email: {emailText}\nAI-svar: {reply}\nFeedback: {feedback}\n\n";
+                System.IO.File.AppendAllText("log.txt", logEntry);
             }
 
             // Vent 30 sekunder før næste tjek
@@ -111,6 +123,7 @@ class Program
 
     static async Task<string> RunPythonAsync(string scriptPath, string inputJson)
     {
+        
         var psi = new ProcessStartInfo
         {
             FileName = "python3",
